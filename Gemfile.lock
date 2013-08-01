@@ -123,6 +123,7 @@ DEPENDENCIES
   coffee-rails (~> 3.2.1)
   jquery-rails
   json
+  multi_json
   mysql
   rails (= 3.2.13)
   rake (= 10.0.4)
