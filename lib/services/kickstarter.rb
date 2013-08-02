@@ -28,6 +28,10 @@ class Kickstarter
 		dir = self.tmp_dir
 		files = Dir["#{dir}/*"]
 		files.each do |file|
+			unless File.exists? (file)
+				puts "Unable to find file #{file}"
+				next
+			end
 			File.open(file) do |f|
 				res = ActiveSupport::JSON.decode(f.read()) 
 				puts res.inspect				
@@ -54,7 +58,6 @@ class Kickstarter
 						:category_str => project['category'].to_json
 					}
 					ks.update_attributes(params)
-					unlink(f)
 				end
 			end
 		end
