@@ -17,12 +17,48 @@ class Kickstarter
 			File.open("#{dir}/#{filename}", 'a+') do |f| 
 				f.write(res) 
 			end
-			#ActiveSupport::JSON.decode(res)
+			#
 		rescue
 			return {}
 		end
 	end
 
+	def create
+		# Read all files
+		dir = self.tmp_dir
+		files = Dir["#{dir}/*"]
+		files.each do |file|
+			File.open(file) do |f|
+				res = ActiveSupport::JSON.decode(f.read()) 
+				puts res.inspect				
+				projects = res["projects"]
+				projects.each do |project|
+					ks = KickstarterProject.find_by_uid(project['id'])
+					unless ks
+						ks = KickstarterProject.new
+					end
+					puts project['deadline']
+					params = {
+						:uid => project['id'],
+						:name => project['name'],
+						:goal => project['goal'],
+						:pledged => project['pledged'],
+						:state => project['state'],
+						:country => project['country'],
+						:creator => project['creator'].to_json,
+						:deadline => DateTime.strptime(project['deadline'].to_s,'%s'), 
+						:project_launched_at => DateTime.strptime(project['launched_at'].to_s,'%s'),
+						:project_created_at => DateTime.strptime(project['created_at'].to_s,'%s'),
+						:backers_count => project['backers_count'],
+						:location_str => project['location'].to_json,
+						:category_str => project['category'].to_json
+					}
+					ks.update_attributes(params)
+					File.delete(f)
+				end
+			end
+		end
+	end
 	
 	def tmp_dir
 		"#{Rails.root}/lib/services/tmp_data/#{self.class}"
