@@ -54,7 +54,7 @@ class Kickstarter
 						:category_str => project['category'].to_json
 					}
 					ks.update_attributes(params)
-					File.delete(f)
+					unlink(f)
 				end
 			end
 		end
